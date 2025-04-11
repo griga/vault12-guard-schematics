@@ -1,0 +1,9 @@
+{
+  "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "vault12-guard-schematics": {
+      "description": "A blank schematic.",
+      "factory": "./vault12-guard-schematics/index#vault12GuardSchematics"
+    }
+  }
+}
