@@ -1,28 +1,20 @@
-# Getting Started With Schematics
+# Boilerplate generation Schematics for Vault12 Guard
 
-This repository is a basic Schematic implementation that serves as a starting point to create and publish Schematics to NPM.
+``` bash
+# clone repo localy
+git clone https://github.com/griga/vault12-guard-schematics
 
-### Testing
+# as this are typescript sources u need to build them to use with angular schematics machinery
+# u can use npm for install and build
+cd vault12-guard-schematics
+pnpm install
+pnpm build
 
-To test locally, install `@angular-devkit/schematics-cli` globally and use the `schematics` command line tool. That tool acts the same as the `generate` command of the Angular CLI, but also has a debug mode.
+# next npm link it into main repo
+cd ../vault12
+npm link ../vault12-guard-schematics
 
-Check the documentation with
+# usage
+./node_modules/.bin/ng g vault12-guard-schematics:ngxs-migration --migration-name=this-is-awesome
 
-```bash
-schematics --help
 ```
-
-### Unit Testing
-
-`npm run test` will run the unit tests, using Jasmine as a runner and test framework.
-
-### Publishing
-
-To publish, simply do:
-
-```bash
-npm run build
-npm publish
-```
-
-That's it!
