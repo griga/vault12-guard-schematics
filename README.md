@@ -1,4 +1,4 @@
-# Boilerplate generation Schematics for Vault12 Guard
+# Boilerplate Schematics for Vault12 Guard
 
 ``` bash
 # clone repo localy
