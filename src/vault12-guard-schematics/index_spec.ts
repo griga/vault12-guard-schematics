@@ -22,26 +22,33 @@ describe('ngxs-migration schematic', () => {
     tree.create('./src/app/state/app/app.state.ts', initialState);
 
     // Create initial restore file migrations index
-    const initialIndex = `import { Migration } from '../migrator/migrator';
+    const restoreFileIndex = `import { Migration } from '../migrator/migrator';
 import { RestoreFile } from '../../features/restore/owner/restore-file/restore-file.model';
 
 export const RestoreFileMigrations: Migration<RestoreFile>[] = [
   // existing migrations
 ];`;
-    tree.create('./src/app/migrations/restore-file/index.ts', initialIndex);
+    tree.create('./src/app/migrations/restore-file/index.ts', restoreFileIndex);
 
-    const resultTree = await runner.runSchematic('ngxs-migration', { migrationName: 'test' }, tree);
+    const appStateFileIndex = `import { AppMigration } from './app-migration.model';
+
+export const appStateMigrations: AppMigration[] = [
+  // existing migrations
+];`;
+    tree.create('./src/app/migrations/state/app/index.ts', appStateFileIndex);
+
+    const resultTree = await runner.runSchematic('ngxs-migration', { migrationName: 'test-migration' }, tree);
     
     // Should create both migration files
-    expect(resultTree.exists('./src/app/migrations/restore-file/6.test.ts')).toBe(true);
-    expect(resultTree.exists('./src/app/migrations/state/app/6.test.ts')).toBe(true);
+    expect(resultTree.exists('./src/app/migrations/restore-file/6.test-migration.ts')).toBe(true);
+    expect(resultTree.exists('./src/app/migrations/state/app/6.test-migration.ts')).toBe(true);
 
     // Check migration file contents
-    const restoreContent = resultTree.readText('./src/app/migrations/restore-file/6.test.ts');
+    const restoreContent = resultTree.readText('./src/app/migrations/restore-file/6.test-migration.ts');
     expect(restoreContent).toContain('version: 5');
     expect(restoreContent).toContain('nextVersion: 6');
 
-    const stateContent = resultTree.readText('./src/app/migrations/state/app/6.test.ts');
+    const stateContent = resultTree.readText('./src/app/migrations/state/app/6.test-migration.ts');
     expect(stateContent).toContain('version: 5');
     expect(stateContent).toContain('nextVersion: 6');
 
@@ -51,8 +58,14 @@ export const RestoreFileMigrations: Migration<RestoreFile>[] = [
 
     // Verify restore file migrations index was updated
     const updatedIndex = resultTree.readText('./src/app/migrations/restore-file/index.ts');
-    expect(updatedIndex).toContain("import { testMigration } from './6.test';");
+    expect(updatedIndex).toContain("import { TestMigration } from './6.test-migration';");
     expect(updatedIndex).toContain('RestoreFileMigrations: Migration<RestoreFile>[] = [');
-    expect(updatedIndex).toContain('testMigration');
+    expect(updatedIndex).toContain('TestMigration');
+
+    // Verify app state migrations index was updated
+    const updatedAppStateIndex = resultTree.readText('./src/app/migrations/state/app/index.ts');
+    expect(updatedAppStateIndex).toContain("import { TestMigration } from './6.test-migration';");
+    expect(updatedAppStateIndex).toContain('appStateMigrations: AppMigration[] = [');
+    expect(updatedAppStateIndex).toContain('TestMigration');
   });
 });

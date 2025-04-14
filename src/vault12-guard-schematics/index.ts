@@ -30,12 +30,12 @@ function updateStateVersion(tree: Tree, version: number): void {
   tree.overwrite(statePath, updatedContent);
 }
 
-function updateRestoreFileMigrationsIndex(tree: Tree, camelCaseName: string, fileName: string): void {
+function updateRestoreFileMigrationsIndex(tree: Tree, migrationName: string, fileName: string): void {
   const indexPath = './src/app/migrations/restore-file/index.ts';
 
   const content = tree.read(indexPath)!.toString();
 
-  const importStatement = `import { ${camelCaseName}Migration } from './${fileName}';\n`;
+  const importStatement = `import { ${migrationName} } from './${fileName}';\n`;
 
   // Split content after the last import statement
   const lastImportMatch = content.match(/^import.*?\n/gm);
@@ -53,17 +53,17 @@ function updateRestoreFileMigrationsIndex(tree: Tree, camelCaseName: string, fil
     importStatement +
     rest.replace(
       /(RestoreFileMigrations\s*:\s*Migration<RestoreFile>\[\]\s*=\s*\[[\s\S]*?)(\];)/,
-      `$1  ${camelCaseName}Migration,\n$2`
+      `$1  ${migrationName},\n$2`
     );
 
   tree.overwrite(indexPath, updatedContent);
 }
 
-function updateAppStateMigrationsIndex(tree: Tree, camelCaseName: string, fileName: string): void {
+function updateAppStateMigrationsIndex(tree: Tree, migrationName: string, fileName: string): void {
   const indexPath = './src/app/migrations/state/app/index.ts';
   const content = tree.read(indexPath)!.toString();
 
-  const importStatement = `import { ${camelCaseName}Migration } from './${fileName}';\n`;
+  const importStatement = `import { ${migrationName} } from './${fileName}';\n`;
 
   // Split content after the last import statement
   const lastImportMatch = content.match(/^import.*?\n/gm);
@@ -81,7 +81,7 @@ function updateAppStateMigrationsIndex(tree: Tree, camelCaseName: string, fileNa
     importStatement +
     rest.replace(
       /(appStateMigrations\s*:\s*AppMigration\[\]\s*=\s*\[[\s\S]*?)(\];)/,
-      `$1  ${camelCaseName}Migration,\n$2`
+      `$1  ${migrationName},\n$2`
     );
 
   tree.overwrite(indexPath, updatedContent);
@@ -91,7 +91,7 @@ function makeAppMigrationContent(version: number, nextVersion: number, name: str
   return `import { AppStateModel } from '@app/state/app/app-state.model';
 import { AppMigration } from './app-migration.model';
 
-export const ${name}Migration = {
+export const ${name} = {
   version: ${version},
   nextVersion: ${nextVersion},
   migrate: (state: AppStateModel) => {
@@ -106,7 +106,7 @@ function makeRestoreFileMigrationContent(version: number, nextVersion: number, n
   return `import { Migration } from '../migrator/migrator';
 import { RestoreFile } from '../../features/restore/owner/restore-file/restore-file.model';
 
-export const ${name}Migration: Migration<RestoreFile> = {
+export const ${name}: Migration<RestoreFile> = {
   version: ${version},
   nextVersion: ${nextVersion},
   migrate: (data) => {
@@ -121,25 +121,29 @@ function kebabToCamelCase(str: string): string {
   return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
 
+function capitalizeFirstLetter(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export function createMigration(options: MigrationOptions): Rule {
   return (tree: Tree, _context: SchematicContext) => {
     const currentVersion = getStateVersion(tree);
     const nextVersion = currentVersion + 1;
-    const camelCaseName = kebabToCamelCase(options.migrationName);
+    const migrationName = capitalizeFirstLetter(kebabToCamelCase(options.migrationName));
     const fileName = `${nextVersion}.${options.migrationName}`;
 
-    const restoreFileMigraition = makeRestoreFileMigrationContent(currentVersion, nextVersion, camelCaseName);
+    const restoreFileMigraition = makeRestoreFileMigrationContent(currentVersion, nextVersion, migrationName);
     tree.create(`./src/app/migrations/restore-file/${fileName}.ts`, restoreFileMigraition);
 
-    const appMigrationContent = makeAppMigrationContent(currentVersion, nextVersion, camelCaseName);
+    const appMigrationContent = makeAppMigrationContent(currentVersion, nextVersion, migrationName);
     tree.create(`./src/app/migrations/state/app/${fileName}.ts`, appMigrationContent);
 
     // Update the version in app.state.ts
     updateStateVersion(tree, nextVersion);
 
     // Update migration indices
-    updateRestoreFileMigrationsIndex(tree, camelCaseName, fileName);
-    updateAppStateMigrationsIndex(tree, camelCaseName, fileName);
+    updateRestoreFileMigrationsIndex(tree, migrationName, fileName);
+    updateAppStateMigrationsIndex(tree, migrationName, fileName);
 
     return tree;
   };
