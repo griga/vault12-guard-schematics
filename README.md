@@ -1,6 +1,6 @@
-# Boilerplate generation Schematics for Vault12 Guard
+# Boilerplate Schematics for Vault12 Guard
 
-to use source version hosted on github
+to use source version hosted on github:
 
 ``` bash
 # clone repo localy
