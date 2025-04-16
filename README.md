@@ -25,7 +25,7 @@ to use from npm:
 
 ``` bash
 # make sure u have access to @vault12/* packages on npm
-npm install @vault12/guard-schematics
+npm i -D @vault12/guard-schematics
 ng g @vault12/guard-schematics:ngxs-migration
 
 ```
