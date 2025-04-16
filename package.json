@@ -12,12 +12,11 @@
   "author": "",
   "license": "MIT",
   "schematics": "./src/collection.json",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "@angular-devkit/core": "^19.2.7",
     "@angular-devkit/schematics": "^19.2.7",
-    "typescript": "~5.7.2"
-  },
-  "devDependencies": {
+    "typescript": "~5.7.2",
     "@types/node": "^18.18.0",
     "@types/jasmine": "~5.1.0",
     "jasmine": "^5.0.0"
