@@ -1,7 +1,7 @@
 {
-  "name": "vault12-guard-schematics",
+  "name": "@vault12/guard-schematics",
   "version": "0.0.0",
-  "description": "A blank schematics",
+  "description": "A collection of Angular schematics for Vault12 Guard",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && jasmine src/**/*_spec.js"
